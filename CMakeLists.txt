@@ -11,6 +11,7 @@ find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
 
 add_executable(robot_arm_visualization 
     src/main.cpp
-    src/robot_arm.cpp)
+    src/robot_arm.cpp
+    src/visualizer.cpp)
 
 target_link_libraries(robot_arm_visualization sfml-graphics sfml-window sfml-system)
