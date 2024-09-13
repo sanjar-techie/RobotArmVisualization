@@ -74,15 +74,15 @@ void Visualizer::drawRobot(const std::vector<JointState>& joint_states) {
         Eigen::Vector2d diffAB = joint_states[1].position - joint_states[0].position;
         float angleA = std::atan2(diffAB.x(), diffAB.y());  // Angle from vertical
         std::ostringstream ossA;
-        ossA << "theta1 = " << std::fixed << std::setprecision(2) << (angleA * 180 / M_PI) << "°";
-        drawAngle(posA, angleA, ossA.str());
+        ossA << "theta1 = " << std::fixed << std::setprecision(0) << (angleA * 180 / M_PI) << "deg";
+        // drawAngle(posA, angleA, ossA.str());
 
         // Angle at B (between first and second link)
         Eigen::Vector2d diffBE = joint_states[2].position - joint_states[1].position;
         float angleB = std::atan2(diffBE.y(), diffBE.x()) - std::atan2(diffAB.y(), diffAB.x());
         std::ostringstream ossB;
-        ossB << "theta2 = " << std::fixed << std::setprecision(2) << (angleB * 180 / M_PI) << "°";
-        drawAngle(posB, angleB, ossB.str());
+        ossB << "theta2 = " << std::fixed << std::setprecision(0) << (angleB * 180 / M_PI) << "deg";
+        // drawAngle(posB, angleB, ossB.str());
     }
 
     window.display();
