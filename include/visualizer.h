@@ -15,12 +15,13 @@ public:
 
 private:
     sf::RenderWindow window;
-    const float scale = 200.0f;  // pixels per unit
-    const sf::Vector2f origin;
+    float scale;  // Now a variable, not a constant
+    sf::Vector2f origin;
     const float link_width = 5.0f;  // Width of the link lines
 
     sf::Font font;
 
+    void calculateScale(const std::vector<JointState>& joint_states);
     sf::Vector2f toScreenCoordinates(const Eigen::Vector2d& v);
     void drawGrid();
     void drawLink(const sf::Vector2f& start, const sf::Vector2f& end);

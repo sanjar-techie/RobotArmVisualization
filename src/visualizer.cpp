@@ -3,10 +3,12 @@
 #include <cmath>
 #include <iomanip>
 #include <sstream>
+#include <algorithm>
 
 Visualizer::Visualizer(int width, int height)
     : window(sf::VideoMode(width, height), "Robot Arm Visualization"),
-      origin(width / 2.0f, height / 2.0f) {
+      origin(width / 2.0f, height / 2.0f),
+      scale(100.0f) {  // Initial scale, will be adjusted
     window.clear(sf::Color::White);
     if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")) {
         std::cerr << "Error loading font. Trying fallback font..." << std::endl;
@@ -16,7 +18,32 @@ Visualizer::Visualizer(int width, int height)
     }
 }
 
+void Visualizer::calculateScale(const std::vector<JointState>& joint_states) {
+    if (joint_states.size() < 3) return;
+
+    Eigen::Vector2d max_pos = joint_states[0].position;
+    Eigen::Vector2d min_pos = joint_states[0].position;
+
+    for (const auto& state : joint_states) {
+        max_pos = max_pos.cwiseMax(state.position);
+        min_pos = min_pos.cwiseMin(state.position);
+    }
+
+    Eigen::Vector2d range = max_pos - min_pos;
+    float max_range = std::max(range.x(), range.y());
+
+    // Calculate scale to fit the robot within 80% of the window
+    float window_min_dimension = std::min(window.getSize().x, window.getSize().y);
+    scale = (0.8f * window_min_dimension) / (max_range * 2);  // *2 to account for positive and negative directions
+
+    // Update origin to center the robot
+    Eigen::Vector2d center = (max_pos + min_pos) / 2;
+    origin.x = window.getSize().x / 2.0f - center.x() * scale;
+    origin.y = window.getSize().y / 2.0f + center.y() * scale;
+}
+
 void Visualizer::drawRobot(const std::vector<JointState>& joint_states) {
+    calculateScale(joint_states);
     window.clear(sf::Color::White);
 
     // Draw grid
@@ -47,14 +74,14 @@ void Visualizer::drawRobot(const std::vector<JointState>& joint_states) {
         Eigen::Vector2d diffAB = joint_states[1].position - joint_states[0].position;
         float angleA = std::atan2(diffAB.x(), diffAB.y());  // Angle from vertical
         std::ostringstream ossA;
-        ossA << "θ1 = " << std::fixed << std::setprecision(2) << angleA;
+        ossA << "theta1 = " << std::fixed << std::setprecision(2) << (angleA * 180 / M_PI) << "°";
         drawAngle(posA, angleA, ossA.str());
 
         // Angle at B (between first and second link)
         Eigen::Vector2d diffBE = joint_states[2].position - joint_states[1].position;
         float angleB = std::atan2(diffBE.y(), diffBE.x()) - std::atan2(diffAB.y(), diffAB.x());
         std::ostringstream ossB;
-        ossB << "θ2 = " << std::fixed << std::setprecision(2) << angleB;
+        ossB << "theta2 = " << std::fixed << std::setprecision(2) << (angleB * 180 / M_PI) << "°";
         drawAngle(posB, angleB, ossB.str());
     }
 
@@ -95,14 +122,14 @@ void Visualizer::drawGrid() {
         float pos = i * cellSize;
 
         sf::Vertex hLine[] = {
-            sf::Vertex(sf::Vector2f(origin.x - gridSize * cellSize, origin.y + pos), sf::Color(200, 200, 200)),
-            sf::Vertex(sf::Vector2f(origin.x + gridSize * cellSize, origin.y + pos), sf::Color(200, 200, 200))
+            sf::Vertex(sf::Vector2f(0, origin.y + pos), sf::Color(200, 200, 200)),
+            sf::Vertex(sf::Vector2f(window.getSize().x, origin.y + pos), sf::Color(200, 200, 200))
         };
         window.draw(hLine, 2, sf::Lines);
 
         sf::Vertex vLine[] = {
-            sf::Vertex(sf::Vector2f(origin.x + pos, origin.y - gridSize * cellSize), sf::Color(200, 200, 200)),
-            sf::Vertex(sf::Vector2f(origin.x + pos, origin.y + gridSize * cellSize), sf::Color(200, 200, 200))
+            sf::Vertex(sf::Vector2f(origin.x + pos, 0), sf::Color(200, 200, 200)),
+            sf::Vertex(sf::Vector2f(origin.x + pos, window.getSize().y), sf::Color(200, 200, 200))
         };
         window.draw(vLine, 2, sf::Lines);
 
