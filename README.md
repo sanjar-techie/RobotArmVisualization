@@ -106,6 +106,13 @@ The project includes visualizations for three specific robot arm configurations:
 
 ![Configuration 2c](robot_conf/config2c.png)
 
+### Configuration 3
+
+- Joint angles: [π/3, -3π/4]
+- Link lengths: [3.0, 3.0]
+
+[Configuration 2c](robot_conf/config3.png)
+
 ## Project Structure
 
 - `include/robot_arm.h`: Header file for the RobotArm class

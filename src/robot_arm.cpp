@@ -1,6 +1,7 @@
 #include "robot_arm.h"
 #include <cmath>
 #include <stdexcept>
+#include <iostream>
 
 RobotArm::RobotArm(const std::vector<double>& joint_angles, const std::vector<double>& link_lengths)
     : joint_angles_(joint_angles), link_lengths_(link_lengths) {
@@ -33,6 +34,11 @@ std::vector<JointState> RobotArm::calculateForwardKinematics() {
     // g_WE:
     Eigen::Matrix3d g_BE = homogeneousTransform({0, link_lengths_[1]}, 0);
     Eigen::Matrix3d g_WE = g_WB * g_BE;
+    std::cout << "End effector position: (" 
+              << g_WE(0, 2) << ", " 
+              << g_WE(1, 2) << ")" << std::endl;
+    std::cout << "End effector orientation: " 
+              << std::atan2(g_WE(1, 0), g_WE(0, 0)) << " radians" << std::endl;
     joint_states.push_back({g_WE.block<2,1>(0,2), g_WE.block<2,2>(0,0)});
 
     return joint_states;
