@@ -15,10 +15,10 @@ int main() {
     // std::vector<double> joint_angles = {M_PI / 8, -2 * M_PI / 3};  
     // std::vector<double> link_lengths = {2.0, 3.0}; 
     // Problem 3
-    std::vector<double> joint_angles = {M_PI / 3, -3 * M_PI / 4};
-    std::vector<double> link_lengths = {3.0, 3.0};
+    std::vector<double> joint_angles = {M_PI * 114.28 / 180, -97.18 * M_PI / 180};
+    std::vector<double> link_lengths = {2.0, 4.0};
 
-    RobotArm robot(joint_angles, link_lengths);
+    RobotArm robot(joint_angles, link_lengths, true);
     std::vector<JointState> joint_states = robot.calculateForwardKinematics();
 
     Visualizer vis(1600, 1200);  // Create a 800x600 window

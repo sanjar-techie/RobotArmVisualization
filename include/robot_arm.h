@@ -11,13 +11,14 @@ struct JointState {
 
 class RobotArm {
 public:
-    RobotArm(const std::vector<double>& joint_angles, const std::vector<double>& link_lengths);
+    RobotArm(const std::vector<double>& joint_angles, const std::vector<double>& link_lengths, bool zero_config_along_x = true);
     
     std::vector<JointState> calculateForwardKinematics();
 
 private:
     std::vector<double> joint_angles_;
     std::vector<double> link_lengths_;
+    bool zero_config_along_x_;
 
     Eigen::Matrix3d homogeneousTransform(const std::vector<double>& positions, double theta);
 };
